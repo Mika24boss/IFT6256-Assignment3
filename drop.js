@@ -9,14 +9,14 @@ class Drop {
   static MAX_VELOCITY = 40;
   static INITIAL_WIDTH = 3;
   COLOR = color(246, 0, 63);
-  SEGMENT_AMOUNT = 2;
-  segments = [];
+  POINT_AMOUNT = 2;
+  points = [];
   state = DropState.Falling;
   collisionSurface = null;
 
   constructor(position_x, position_y, velocity_x, velocity_y, width) {
     this.position = createVector(position_x, position_y);
-    this.segments.push(this.position.copy());
+    this.points.push(this.position.copy());
     this.velocity = createVector(velocity_x, velocity_y);
     this.width = width;
   }
@@ -51,24 +51,24 @@ class Drop {
     }
 
 
-    // Update segments
+    // Update points
     if (this.state === DropState.Falling || this.state === DropState.HitSurface) {
-      this.segments.push(this.position.copy());
+      this.points.push(this.position.copy());
     }
-    if (this.segments.length > this.SEGMENT_AMOUNT || this.state === DropState.Disappearing) {
-      this.segments.shift();
+    if (this.points.length > this.POINT_AMOUNT || this.state === DropState.Disappearing) {
+      this.points.shift();
     }
 
-    if (this.segments.length === 0) {
+    if (this.points.length === 0) {
       this.state = DropState.ShouldRemove;
     }
   }
 
   draw() {
     push();
-    let previousPosition = this.segments[0];
-    for (let i = 1; i < this.segments.length; i++) {
-      let current_position = this.segments[i];
+    let previousPosition = this.points[0];
+    for (let i = 1; i < this.points.length; i++) {
+      let current_position = this.points[i];
       stroke(this.COLOR);
       strokeWeight(this.width);
       line(previousPosition.x, previousPosition.y, current_position.x, current_position.y);
@@ -86,7 +86,7 @@ class Drop {
     const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / denominator;
 
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-      t *= 0.95; // Move the hit point slightly back to prevent the splash going through the surface
+      t *= 0.9; // Move the hit point slightly back to prevent the splash going through the surface
       return createVector(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y));
     }
     return null;

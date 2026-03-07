@@ -4,12 +4,6 @@ class Surface {
     this.p2 = createVector(x2, y2);
   }
 
-  draw() {
-    stroke(40, 100, 30);
-    strokeWeight(10);
-    line(this.p1.x, this.p1.y, this.p2.x, this.p2.y);
-  }
-
   getNormalVector() {
     let v = createVector(this.p2.x - this.p1.x, this.p2.y - this.p1.y);
     v.rotate(-HALF_PI); 

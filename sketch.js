@@ -16,11 +16,15 @@ const SPLASH_WIDTH_MULT = 0.5;
 
 let surfaces = [];
 let grass;
+let house;
+let grassScale = 0.1;
+let houseScale = 0.7;
 
 function preload() {
   birthsPerSecondData = loadTable("data/births_per_second.csv", "csv", "header");
   countryLongitudesData = loadTable("data/country_longitudes.csv", "csv", "header");
   grass = loadImage("/assets/2d_grass_side_view.png");
+  house = loadImage("/assets/minecraft_house.png");
 }
 
 function setup() {
@@ -44,7 +48,17 @@ function windowResized() {
 }
 
 function draw() {
-  background(246, 100, 20);
+  // background(246, 100, 20);
+  let darkblue = color(240, 100, 10);
+  let marineblue = color(240, 100, 30);
+  let lightblue = color(200, 100, 50);
+
+  for (let i = 0; i < height; i++) {
+    let mergeColor = lerpColor(darkblue, marineblue, i / height);
+    mergeColor = lerpColor(mergeColor, lightblue, i / height);
+    stroke(mergeColor);
+    line(0, i, width, i);
+  }
 
   // Display year
   push();
@@ -166,8 +180,6 @@ function handleSplash(drop, newDrops) {
 
   if (drop.width <= 1) return; // Don't create new drops if the drop is already small
 
-  // if (!drop.collisionSurface) return; // not sure about this yet
-
   // Create new drops for a splash effect
 
   let isSurfaceHit = drop.collisionSurface != null;
@@ -201,19 +213,23 @@ function handleSplash(drop, newDrops) {
 }
 
 function createSurfaces() {
-  surfaces.push(new Surface(width / 2, height * 0.4, (2 / 3) * width, height * 0.7));
-  surfaces.push(new Surface((1 / 3) * width, height * 0.7, width / 2, height * 0.4));
+  let topHouse = height - house.height * houseScale - 10;
+  let roofLength1D = 550 * houseScale;
+  let leftRoofEdge = width / 2 - roofLength1D;
+  let rightRoofEdge = width / 2 + roofLength1D;
+  let bottomRoofEdge = topHouse + roofLength1D;
+  surfaces.push(new Surface(leftRoofEdge, bottomRoofEdge, width / 2, topHouse));
+  surfaces.push(new Surface(width / 2, topHouse, rightRoofEdge, bottomRoofEdge));
 }
 
 function drawEnvironment(surfaces) {
-  for (let surface of surfaces) {
-    surface.draw();
-  }
+  // Draw house
+  let leftHouse = width / 2 - (house.width * houseScale) / 2;
+  let topHouse = height - house.height * houseScale;
+  image(house, leftHouse, topHouse, house.width * houseScale, house.height * houseScale);
 
-  let grassWidth = 1024;
-  let grassHeight = 256;
-  let grassScale = 0.3;
-  for (let left = 0; left < width; left += grassWidth * grassScale) {
-    image(grass, left, height - grassHeight * grassScale, grassWidth * grassScale, grassHeight * grassScale);
+  // Draw grass
+  for (let left = 0; left < width; left += grass.width * grassScale) {
+    image(grass, left, height - grass.height * grassScale, grass.width * grassScale, grass.height * grassScale);
   }
 }

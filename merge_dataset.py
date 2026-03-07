@@ -2,7 +2,7 @@ import pandas as pd
 import geopandas as gpd
 
 SECONDS_PER_YEAR = 365.25 * 24 * 3600
-TOP_COUNTRIES_AMOUNT = 500
+TOP_COUNTRIES_AMOUNT = 150
 
 # Combine birth rate and population datasets to calculate births per second
 birth_rate = pd.read_csv("data/OWID-long-run-birth-rate.csv")
