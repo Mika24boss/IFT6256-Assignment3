@@ -1,6 +1,6 @@
 const MARGIN = 5;
 const FRAMERATE = 60;
-const BIRTH_MULTIPLIER = 20 / FRAMERATE;
+const BIRTH_MULTIPLIER = 1 / FRAMERATE;
 let year = 1900;
 let yearSpeed = 0.05;
 let birthsPerSecondData;
@@ -9,8 +9,8 @@ let birthsByYear = {};
 let longitudesByCountry = {};
 
 let drops = [];
-const SPLASH_VELOCITY_MULT_MIN = 0.08;
-const SPLASH_VELOCITY_MULT_MAX = 0.1;
+const SPLASH_VELOCITY_MULT_MIN = 0.1;
+const SPLASH_VELOCITY_MULT_MAX = 0.15;
 const SPLASH_DROP_AMOUNT = 3;
 const SPLASH_WIDTH_MULT = 0.5;
 
@@ -73,10 +73,12 @@ function draw() {
   for (let index = 0; index < birthAmounts.length; index++) {
     let countryBirthData = birthAmounts[index];
     let countryCode = countryBirthData.getString("code");
+    let countryName = countryBirthData.getString("entity");
     let births = countryBirthData.getNum("births_per_second");
     let adjustedBirths = births * BIRTH_MULTIPLIER;
 
     if (random() < adjustedBirths) {
+      console.log("Spawning drop for", countryName, "with", births.toFixed(3), "births per second!");
       spawnDrop(countryCode, drops);
     }
   }
@@ -88,7 +90,7 @@ function draw() {
     frameCount = 0;
   }
 
-  drawEnvironment(surfaces);
+  drawEnvironment();
 }
 
 function indexBirthsByYear() {
@@ -222,7 +224,7 @@ function createSurfaces() {
   surfaces.push(new Surface(width / 2, topHouse, rightRoofEdge, bottomRoofEdge));
 }
 
-function drawEnvironment(surfaces) {
+function drawEnvironment() {
   // Draw house
   let leftHouse = width / 2 - (house.width * houseScale) / 2;
   let topHouse = height - house.height * houseScale;

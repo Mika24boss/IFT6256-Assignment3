@@ -25,7 +25,7 @@ class Drop {
     let oldPosition = this.position.copy();
 
     // Update position
-    let acceleration = createVector(0, 0.1);
+    let acceleration = createVector(0, 0.4);
     this.velocity.add(acceleration);
     this.velocity.limit(this.MAX_VELOCITY);
     this.position.add(this.velocity);
