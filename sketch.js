@@ -1,6 +1,6 @@
 const MARGIN = 5;
 const FRAMERATE = 60;
-const BIRTH_MULTIPLIER = 60 / FRAMERATE;
+const BIRTH_MULTIPLIER = 20 / FRAMERATE;
 let year = 1900;
 let yearSpeed = 0.05;
 let birthsPerSecondData;
@@ -11,7 +11,7 @@ let longitudesByCountry = {};
 let drops = [];
 const SPLASH_VELOCITY_MULT_MIN = 0.08;
 const SPLASH_VELOCITY_MULT_MAX = 0.1;
-const SPLASH_DROP_AMOUNT = 5;
+const SPLASH_DROP_AMOUNT = 3;
 const SPLASH_WIDTH_MULT = 0.5;
 
 let surfaces = [];
@@ -48,10 +48,10 @@ function windowResized() {
 }
 
 function draw() {
-  // background(246, 100, 20);
-  let darkblue = color(240, 100, 10);
-  let marineblue = color(240, 100, 30);
-  let lightblue = color(200, 100, 50);
+  background(0);
+  let darkblue = color(240, 100, 20);
+  let marineblue = color(240, 100, 40);
+  let lightblue = color(200, 100, 60);
 
   for (let i = 0; i < height; i++) {
     let mergeColor = lerpColor(darkblue, marineblue, i / height);
@@ -178,7 +178,7 @@ function updateDrops(drops) {
 function handleSplash(drop, newDrops) {
   drop.state = DropState.Disappearing;
 
-  if (drop.width <= 1) return; // Don't create new drops if the drop is already small
+  if (drop.width < Drop.INITIAL_WIDTH) return; // Don't create new drops if the drop is already small
 
   // Create new drops for a splash effect
 

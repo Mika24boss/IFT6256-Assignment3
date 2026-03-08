@@ -7,7 +7,7 @@ const DropState = {
 
 class Drop {
   static MAX_VELOCITY = 40;
-  static INITIAL_WIDTH = 3;
+  static INITIAL_WIDTH = 4;
   COLOR = color(246, 0, 63);
   POINT_AMOUNT = 2;
   points = [];
