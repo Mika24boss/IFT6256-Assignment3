@@ -8,6 +8,7 @@ const DropState = {
 class Drop {
   static MAX_VELOCITY = 40;
   static INITIAL_WIDTH = 4;
+  GRAVITY = 0.4;
   COLOR = color(250, 0, 64);
   POINT_AMOUNT = 2;
   points = [];
@@ -26,7 +27,7 @@ class Drop {
     let oldPosition = this.position.copy();
 
     // Update position
-    let acceleration = createVector(0, 0.4);
+    let acceleration = createVector(0, this.GRAVITY);
     this.velocity.add(acceleration);
     this.velocity.limit(this.MAX_VELOCITY);
     this.position.add(this.velocity);

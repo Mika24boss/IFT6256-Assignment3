@@ -1,7 +1,7 @@
 const MARGIN = 5;
 const FRAMERATE = 60;
-const BIRTH_MULTIPLIER = 20; // Multiplies the number of drops spawned
-const YEAR_DELAY = FRAMERATE / 2; // Number of frames to wait before increasing the year
+const BIRTH_MULTIPLIER = 1; // Multiplies the number of drops spawned
+const YEAR_DELAY = FRAMERATE / 4; // Number of frames to wait before increasing the year
 let year = 1900;
 let yearCounter = 0;
 let birthsPerSecondData;
