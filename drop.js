@@ -1,6 +1,6 @@
 const DropState = {
   Falling: "Falling",
-  HitSurface: "HitSurface",
+  HitCollider: "HitCollider",
   Disappearing: "Disappearing",
   ShouldRemove: "ShouldRemove",
 };
@@ -8,20 +8,21 @@ const DropState = {
 class Drop {
   static MAX_VELOCITY = 40;
   static INITIAL_WIDTH = 4;
-  COLOR = color(246, 0, 63);
+  COLOR = color(250, 0, 64);
   POINT_AMOUNT = 2;
   points = [];
   state = DropState.Falling;
-  collisionSurface = null;
+  colliderHit = null;
 
-  constructor(position_x, position_y, velocity_x, velocity_y, width) {
+  constructor(position_x, position_y, velocity_x, velocity_y, width, countryName) {
     this.position = createVector(position_x, position_y);
     this.points.push(this.position.copy());
     this.velocity = createVector(velocity_x, velocity_y);
     this.width = width;
+    this.countryName = countryName;
   }
 
-  update(surfaces) {
+  update(colliders) {
     let oldPosition = this.position.copy();
 
     // Update position
@@ -31,14 +32,13 @@ class Drop {
     this.position.add(this.velocity);
 
     if (this.state == DropState.Falling) {
-      
-      // Check surfaces
-      for (let surface of surfaces) {
-        let hit = this.getIntersection(oldPosition, this.position, surface.p1, surface.p2);
-        if (hit) {
-          this.position = hit;
-          this.state = DropState.HitSurface;
-          this.collisionSurface = surface;
+      // Check colliders
+      for (let collider of colliders) {
+        let intersection = this.getIntersection(oldPosition, this.position, collider.p1, collider.p2);
+        if (intersection) {
+          this.position = intersection;
+          this.state = DropState.HitCollider;
+          this.colliderHit = collider;
           break;
         }
       }
@@ -46,19 +46,19 @@ class Drop {
       // Check if the drop hit the ground
       if (this.position.y > height) {
         this.position.y = height;
-        this.state = DropState.HitSurface;
+        this.state = DropState.HitCollider;
       }
     }
 
-
-    // Update points
-    if (this.state === DropState.Falling || this.state === DropState.HitSurface) {
+    // Add new point to the trail
+    if (this.state === DropState.Falling || this.state === DropState.HitCollider) {
       this.points.push(this.position.copy());
     }
+    // Remove oldest point
     if (this.points.length > this.POINT_AMOUNT || this.state === DropState.Disappearing) {
       this.points.shift();
     }
-
+    // Mark for deletion
     if (this.points.length === 0) {
       this.state = DropState.ShouldRemove;
     }
@@ -86,9 +86,31 @@ class Drop {
     const u = -((p1.x - p2.x) * (p1.y - p3.y) - (p1.y - p2.y) * (p1.x - p3.x)) / denominator;
 
     if (t >= 0 && t <= 1 && u >= 0 && u <= 1) {
-      t *= 0.9; // Move the hit point slightly back to prevent the splash going through the surface
+      t *= 0.9; // Move the hit point slightly back to prevent the splash going through the collider
       return createVector(p1.x + t * (p2.x - p1.x), p1.y + t * (p2.y - p1.y));
     }
     return null;
+  }
+
+  isMouseOver() {
+    let padding = 5;
+    let threshold = this.width / 2 + padding;
+
+    // Check if the distance from the mouse to a line segment is small enough
+    for (let i = 1; i < this.points.length; i++) {
+      let a = this.points[i - 1];
+      let b = this.points[i];
+      
+      if (this.distToSegment(a, b) < threshold) return true;
+    }
+    return false;
+  }
+
+  distToSegment(a, b) {
+    let a_to_b = b.copy().sub(a);
+    let a_to_mouse = createVector(mouseX - a.x, mouseY - a.y);
+    let t = constrain(a_to_mouse.dot(a_to_b) / a_to_b.magSq(), 0, 1); // High dot product means the mouse is in the same direction as the line segment --> t = 1 --> closest to b
+    let closestPoint = createVector(a.x + t * a_to_b.x, a.y + t * a_to_b.y);
+    return dist(mouseX, mouseY, closestPoint.x, closestPoint.y);
   }
 }
