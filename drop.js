@@ -7,27 +7,26 @@ const DropState = {
 
 class Drop {
   static MAX_VELOCITY = 40;
-  static INITIAL_WIDTH = 4;
-  GRAVITY = 0.4;
   COLOR = color(250, 0, 64);
   POINT_AMOUNT = 2;
   points = [];
   state = DropState.Falling;
   colliderHit = null;
 
-  constructor(position_x, position_y, velocity_x, velocity_y, width, countryName) {
+  constructor(position_x, position_y, velocity_x, velocity_y, width, countryName, gravity) {
     this.position = createVector(position_x, position_y);
     this.points.push(this.position.copy());
     this.velocity = createVector(velocity_x, velocity_y);
     this.width = width;
     this.countryName = countryName;
+    this.gravity = gravity;
   }
 
   update(colliders) {
     let oldPosition = this.position.copy();
 
     // Update position
-    let acceleration = createVector(0, this.GRAVITY);
+    let acceleration = createVector(0, this.gravity);
     this.velocity.add(acceleration);
     this.velocity.limit(this.MAX_VELOCITY);
     this.position.add(this.velocity);

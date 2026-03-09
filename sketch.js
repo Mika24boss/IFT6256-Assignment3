@@ -15,6 +15,8 @@ const SPLASH_VELOCITY_MULT_MIN = 0.1;
 const SPLASH_VELOCITY_MULT_MAX = 0.15;
 const SPLASH_DROP_AMOUNT = 3;
 const SPLASH_WIDTH_MULT = 0.5;
+let gravity = 0.4;
+let dropWidth = 4;
 
 let colliders = [];
 let grass;
@@ -34,8 +36,7 @@ function setup() {
   let canvasWidth = windowWidth - 2 * MARGIN;
   let canvasHeight = windowHeight - 2 * MARGIN;
   createCanvas(canvasWidth, canvasHeight);
-  houseScale = (height * 0.5) / house.height;
-  createColliders();
+  adjustScales();
 
   indexBirthsByYear();
   indexLongitudesByCountry();
@@ -47,8 +48,7 @@ function windowResized() {
   let canvasWidth = windowWidth - 2 * MARGIN;
   let canvasHeight = windowHeight - 2 * MARGIN;
   resizeCanvas(canvasWidth, canvasHeight);
-  houseScale = (height * 0.5) / house.height;
-  createColliders();
+  adjustScales();
 }
 
 function draw() {
@@ -150,6 +150,15 @@ function keyPressed() {
   }
 }
 
+function adjustScales() {
+  houseScale = (height * 0.5) / house.height;
+  createColliders();
+  gravity = -0.0004 * height + 0.92;
+  gravity = constrain(gravity, 0.3, 0.8);
+  dropWidth = 1.5/600 * height + 0.5;
+  dropWidth = constrain(dropWidth, 2, 5);
+}
+
 function spawnDropsForYear() {
   let birthAmounts = birthsByYear[year];
 
@@ -173,7 +182,7 @@ function spawnDrop(countryCode, countryName, drops) {
   let maxLongitude = longitudeData.getNum("max_long");
   let longitude = random(minLongitude, maxLongitude);
   let x = map(longitude, -180, 180, 0, width);
-  drops.push(new Drop(x, 0, 0, Drop.MAX_VELOCITY, Drop.INITIAL_WIDTH, countryName));
+  drops.push(new Drop(x, 0, random(-2, 2), Drop.MAX_VELOCITY, dropWidth, countryName, gravity));
 }
 
 function updateDrops(drops) {
@@ -195,7 +204,7 @@ function updateDrops(drops) {
 function handleSplash(drop, newDrops) {
   drop.state = DropState.Disappearing;
 
-  if (drop.width < Drop.INITIAL_WIDTH) return; // Don't create new drops if the drop is already small
+  if (drop.width < dropWidth) return; // Don't create new drops if the drop is already small
 
   // Create new drops for a splash effect
 
@@ -227,7 +236,15 @@ function handleSplash(drop, newDrops) {
     let velocityX = cos(angle) * newVelocityMag;
     let velocityY = sin(angle) * newVelocityMag;
     newDrops.push(
-      new Drop(spawnPosition.x, spawnPosition.y, velocityX, velocityY, drop.width * SPLASH_WIDTH_MULT, drop.countryName)
+      new Drop(
+        spawnPosition.x,
+        spawnPosition.y,
+        velocityX,
+        velocityY,
+        drop.width * SPLASH_WIDTH_MULT,
+        drop.countryName,
+        gravity
+      )
     );
   }
 }
